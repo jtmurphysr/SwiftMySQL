@@ -86,17 +86,14 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate, U
         let request = NSMutableURLRequest(URL:myUrl!);
         request.HTTPMethod = "POST";
         
-        let config = NSURLSessionConfiguration.defaultSessionConfiguration()
-        let session = NSURLSession(configuration: config)
+        let postString = "userEmail=\(userEmail!)&userFirstName=\(userFirstName!)&userLastName=\(userLastName!)&userPassword=\(userPassword!)"
         
-        let postString = "userEmail=\(userEmail!)&userFirstName=\(userFirstName!)&userLastName=\(userLastName!)&userPassword=\(userPassword!)";
+        print(postString)
+        //returns userEmail=bob@email.com&userFirstName=Bob&userLastName=smith&userPassword=1234
         
         request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding);
         
-        print(request)
-        print(request.HTTPBody)
-        
-        let task = session.dataTaskWithRequest(request, completionHandler: { (data:NSData?, response:NSURLResponse?, error:NSError?) -> Void in
+        NSURLSession.sharedSession().dataTaskWithRequest(request, completionHandler: { (data:NSData?, response:NSURLResponse?, error:NSError?) -> Void in
             
             dispatch_async(dispatch_get_main_queue())
                 {
@@ -113,37 +110,32 @@ class SignUpViewController: UIViewController, UIImagePickerControllerDelegate, U
                             
                             let userId = parseJSON["userId"] as? String
                             
-                            if( userId != nil) {
-                                let myAlert = UIAlertController(title: "Alert", message: "Registration successful", preferredStyle: UIAlertControllerStyle.Alert);
+                            if( userId != nil)
+                            {
+                                let myAlert = UIAlertController(title: "Alert", message: "Registration successful", preferredStyle: UIAlertControllerStyle.Alert)
                                 
                                 let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default){(action) in
                                     
                                     self.dismissViewControllerAnimated(true, completion: nil)
-                                    
                                 }
-                                myAlert.addAction(okAction);
+                                
+                                myAlert.addAction(okAction)
                                 self.presentViewController(myAlert, animated: true, completion: nil)
                             } else {
-                                
                                 let errorMessage = parseJSON["message"] as? String
                                 if(errorMessage != nil)
                                 {
                                     self.displayMessage(errorMessage!)
                                 }
+                                
                             }
-                            
                         }
-                        
-                        
-                    } catch {
+                    } catch{
                         print(error)
                     }
-                    
-                    
             }
-        })
-        task.resume()
-        
+        }).resume()
+      
         
         
         
